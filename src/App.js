@@ -1,25 +1,29 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
+import { Route, NavLink, HashRouter } from 'react-router-dom';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+// importando componentes
+import Login from './components/usuarios/Login';
+import Register from './components/usuarios/Register';
+
+class App extends React.Component {
+  // metodo para renderizar o conteudo html do componente
+  render() {
+    return (
+      <HashRouter>
+        <div className="container mt-4">
+          <div>
+            <NavLink to="/login" className="btn btn-light mr-2" >Acessar Sistemas</NavLink> 
+            <NavLink to="/register"  className="btn btn-light">Criar Conta do Usuário</NavLink>
+          </div>
+
+          <div className="mt-5">
+              <Route path="/login" component={Login} />
+              <Route path="/register" component={Register} />
+          </div>
+        </div>
+      </HashRouter>
+    )
+  }
 }
 
 export default App;
