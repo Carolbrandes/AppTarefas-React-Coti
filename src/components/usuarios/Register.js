@@ -9,7 +9,10 @@ class Register extends React.Component {
 
         //declarando o state do componente..
         this.state = {
-            nome : '', email : '', senha : '', senhaConfirmacao : ''
+            nome: '', email: '', senha: '', senhaConfirmacao: '',
+            disabledElements: false,
+            messages: { success: '', error: '' },
+            validationErrors: { nome: [], email: [], senha: [], senhaConfirmacao: [] }
         }
 
         //Para que uma função possa acessar o conteudo do state, ela deve
@@ -23,17 +26,17 @@ class Register extends React.Component {
     }
 
     //função para ler o valor preenchido no campo nome..
-    handleNome(e) { this.setState({ nome : e.target.value }); }
+    handleNome(e) { this.setState({ nome: e.target.value }); }
     //função para ler o valor preenchido no campo email..
-    handleEmail(e) { this.setState({ email : e.target.value }); }
+    handleEmail(e) { this.setState({ email: e.target.value }); }
     //função para ler o valor preenchido no campo senha..
-    handleSenha(e) { this.setState({ senha : e.target.value }); }
+    handleSenha(e) { this.setState({ senha: e.target.value }); }
     //função para ler o valor preenchido no campo senhaConfirmacao..
-    handleSenhaConfirmacao(e) { this.setState({ senhaConfirmacao : e.target.value }); }
+    handleSenhaConfirmacao(e) { this.setState({ senhaConfirmacao: e.target.value }); }
 
     //função para limpar os campos do formulário
-    handleReset(e){
-        this.setState({ nome : '', email : '', senha : '', senhaConfirmacao : '' })
+    handleReset(e) {
+        this.setState({ nome: '', email: '', senha: '', senhaConfirmacao: '' })
     }
 
     //função executada no evento submit do formulário
@@ -41,23 +44,65 @@ class Register extends React.Component {
         //anular o submit do formulário
         e.preventDefault();
 
+        //acessando o conteudo do state..
+        this.setState({
+            disabledElements: true,
+            messages: { success: '', error: '' },
+            validationErrors: { nome: [], email: [], senha: [], senhaConfirmacao: [] }
+        });
+
         var request = {
-            nome : this.state.nome,
-            email : this.state.email,
-            senha : this.state.senha,
-            senhaConfirmacao : this.state.senhaConfirmacao
+            nome: this.state.nome,
+            email: this.state.email,
+            senha: this.state.senha,
+            senhaConfirmacao: this.state.senhaConfirmacao
         }
 
         //executando o método post do arquivo usuarioServives.js
         services.post(request)
             .then( //promisse de sucesso
                 data => {
-                    console.log(data);
+
+                    this.setState({
+                        messages: { success: data },
+                        disabledElements: false,
+                        nome: '',
+                        email: '',
+                        senha: '',
+                        senhaConfirmacao: ''
+                    })
                 }
             )
             .catch( //promisse de erro
                 e => {
-                    console.log(e.response);
+
+                    switch (e.response.status) {
+                        case 400: //erros de validação
+                            var errors = e.response.data.errors;
+
+                            this.setState({
+                                validationErrors: {
+                                    nome: errors.Nome || [],
+                                    email: errors.Email || [],
+                                    senha: errors.Senha || [],
+                                    senhaConfirmacao: errors.SenhaConfirmacao || []
+                                }
+                            })
+
+                            break;
+
+                        case 500: //internal server error
+                            this.setState({
+                                messages: {
+                                    error: e.response.data
+                                }
+                            });
+                            break;
+                    }
+
+                    this.setState({
+                        disabledElements: false
+                    })
                 }
             );
     }
@@ -69,41 +114,111 @@ class Register extends React.Component {
                 <div className="col-md-4">
                     <h5>Cadastro de Conta de Usuário</h5>
 
+                    {
+                        this.state.messages.success ?
+                            <div className="text-success mb-2">
+                                <strong>{this.state.messages.success}</strong>
+                            </div>
+                            : <div></div>
+                    }
+
+                    {
+                        this.state.messages.error ?
+                            <div className="text-danger mb-2">
+                                <strong>{this.state.messages.error}</strong>
+                            </div>
+                            : <div></div>
+                    }
+
                     <form method="POST" onSubmit={this.handleSubmit}>
                         <div className="form-group">
                             <label>Nome do Usuário:</label>
                             <input type="text" className="form-control"
                                 placeholder="Ex: João Carlos"
                                 onChange={this.handleNome}
-                                value={this.state.nome} />
+                                value={this.state.nome}
+                                disabled={this.state.disabledElements} />
+                            <ul className="text-danger">
+                                {
+                                    this.state.validationErrors.nome.map(
+                                        function (item, i) {
+                                            return (
+                                                <li key={i}>
+                                                    <small>{item}</small>
+                                                </li>
+                                            )
+                                        }
+                                    )
+                                }
+                            </ul>
                         </div>
                         <div className="form-group">
                             <label>Email de Acesso:</label>
                             <input type="email" className="form-control"
                                 placeholder="Ex: joaocarlos@gmail.com"
                                 onChange={this.handleEmail}
-                                value={this.state.email}  />
+                                value={this.state.email}
+                                disabled={this.state.disabledElements} />
+                            <ul className="text-danger">
+                                {
+                                    this.state.validationErrors.email.map(
+                                        function (item, i) {
+                                            return (
+                                                <li key={i}>
+                                                    <small>{item}</small>
+                                                </li>
+                                            )
+                                        }
+                                    )
+                                }
+                            </ul>
                         </div>
                         <div className="form-group">
                             <label>Senha de Acesso:</label>
                             <input type="password" className="form-control"
                                 placeholder="Digite aqui"
                                 onChange={this.handleSenha}
-                                value={this.state.senha}  />
+                                value={this.state.senha}
+                                disabled={this.state.disabledElements} />
+                            <ul className="text-danger">
+                                {
+                                    this.state.validationErrors.senha.map(
+                                        function (item, i) {
+                                            return (
+                                                <li key={i}>
+                                                    <small>{item}</small>
+                                                </li>
+                                            )
+                                        }
+                                    )
+                                }
+                            </ul>
                         </div>
                         <div className="form-group">
                             <label>Confirme a Senha:</label>
                             <input type="password" className="form-control"
                                 placeholder="Digite aqui"
                                 onChange={this.handleSenhaConfirmacao}
-                                value={this.state.senhaConfirmacao}  />
+                                value={this.state.senhaConfirmacao}
+                                disabled={this.state.disabledElements} />
+                            <ul className="text-danger">
+                                {
+                                    this.state.validationErrors.senhaConfirmacao.map(
+                                        function (item, i) {
+                                            return (
+                                                <li key={i}>
+                                                    <small>{item}</small>
+                                                </li>
+                                            )
+                                        }
+                                    )
+                                }
+                            </ul>
                         </div>
                         <div className="form-group">
                             <input type="submit" value="Realizar Cadastro"
-                                className="btn btn-success mr-2" />
-                             <input type="button" value="Limpar Campos"
-                                onClick={this.handleReset}
-                                className="btn btn-secondary" />
+                                className="btn btn-success mr-2"
+                                disabled={this.state.disabledElements} />
                         </div>
                     </form>
 

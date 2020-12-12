@@ -1,0 +1,1 @@
+export const BASE_URI = "http://cotireact001-001-site1.etempurl.com/api";
