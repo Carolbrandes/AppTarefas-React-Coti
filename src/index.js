@@ -5,19 +5,32 @@ import App from './App';
 import Admin from './Admin';
 import reportWebVitals from './reportWebVitals';
 
+//importando bibliotecas do REDUX e REDUX-FORM
+import { createStore, combineReducers } from 'redux';
+import { Provider } from 'react-redux';
+import { reducer as formReducer } from 'redux-form'
+
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 
+//mapeamento de todos os REDUCERS do projeto..
+const rootReducer = combineReducers({
+  //registrando o REDUCER do REDUX-FORM
+  form: formReducer
+});
+
+//criando a STORE do projeto (memória do projeto)!!
+const store = createStore(rootReducer);
+
 ReactDOM.render(
-  <BrowserRouter>
-    <Switch>
-      <Route path="/" exact={true} component={App}/>
-      <Route path="/admin" component={Admin}/>
-    </Switch>
-  </BrowserRouter>,
+  <Provider store={store}>
+    <BrowserRouter>
+      <Switch>
+        <Route path="/" exact={true} component={App} />
+        <Route path="/admin" component={Admin} />
+      </Switch>
+    </BrowserRouter>
+  </Provider>,
   document.getElementById('root')
 );
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+// If you want to start measuring performance in your app, 
