@@ -1,11 +1,20 @@
 import React from 'react';
 import ConsultaTarefaForm from './ConsultaTarefaForm';
 import GridTarefas from './GridTarefas';
+import { connect } from 'react-redux'; //conectar o componente ao REDUX..
+import * as actions from '../../actions/tarefasAction'; //importando os nomes das ACTIONS!
 
 class ConsultaTarefaContainer extends React.Component {
 
+    //função executada no SUBMIT do formulário
+    //values -> JSON contendo os valores preenchidos no formulário
     handleSubmit = (values) => {
-        console.log(values);
+        
+        //disparando uma ACTION para o REDUX!!
+        this.props.dispatch({
+            type : actions.CONSULTAR_TAREFAS, //nome da ACTION!
+            data : values //dados da ACTION!
+        });
     }
 
     render() {
@@ -28,4 +37,8 @@ class ConsultaTarefaContainer extends React.Component {
 
 }
 
-export default ConsultaTarefaContainer;
+//conectando o componente ao REDUX..
+export default connect()(ConsultaTarefaContainer);
+
+
+

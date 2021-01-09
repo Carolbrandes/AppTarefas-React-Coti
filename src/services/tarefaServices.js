@@ -31,7 +31,7 @@ export const remove = (id) => {
         );
 }
 
-export const getAll = () => { 
+export const getAll = (dataInicio, dataFim) => { 
     return axios.get(url)
         .then( 
             response => {
@@ -66,3 +66,8 @@ axios.interceptors.request.use(
         Promise.reject(error);
     }
 )
+
+
+
+
+
